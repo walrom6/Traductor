@@ -1,0 +1,81 @@
+package parser;
+
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+
+action code {:
+
+:};
+	
+parser code
+{:
+	public void syntax_error(Symbol s){
+		System.out.println("Error Sintáctico en la Linea: " + (s.left +1) + ", Columna: " + (s.right + 1) + 
+		" -> Texto: \"" + s.value + "\""); //+"Pila:  " + this.stack);
+	}
+   
+    public void report_fatal_error(String message, Object info) {
+        //report_error(message, info);
+        //System.exit(1);
+    }
+:}
+
+/* Terminales */
+terminal    Signo_Punto, Signo_Coma, Signo_PuntoComa, Signo_AdmiracionAbre, Signo_AdmiracionCierra, Signo_PreguntaAbre, Signo_PreguntaCierra,Signo_Guion;
+terminal    Ropa;
+terminal    Adverbio, Verbo, Pronombre, Literal, Sustantivo, Adjetivo, Preposicion, Articulo;
+terminal    Nombre_Propio, Identificador;
+terminal    Exponencial, Flotante, Real, Entero;
+
+/* No Terminales */
+non terminal Predicado, Parrafo, Oracion, Sujeto;
+non terminal Oracion_Negativa, Oracion_Yuxtapuesta, Oracion_Compulativa, Oracion_Interrogativa;
+
+Parrafo ::=   Oracion {:System.out.println("Código analizado");:}
+              | Oracion Parrafo
+              ;
+
+Oracion ::=   Sujeto Predicado Signo_Punto
+              | Nombre_Propio Predicado Ropa Signo_Punto
+              | Sujeto Verbo Ropa
+              ;
+
+Sujeto ::=   Articulo Ropa
+            | Pronombre
+            | Nombre_Propio
+            | Ropa
+            ;  
+
+Predicado ::=   Verbo Preposicion Sujeto
+                | Verbo Preposicion Sustantivo
+                | Verbo Sustantivo
+                | Verbo Sujeto
+                | Verbo
+                ;
+
+Oracion_Negativa ::=    Sujeto Negacion Predicado Signo_PreguntaCierra 
+                           | Sujeto Negacion Predicado Signo_PreguntaCierra
+                           | Nombre_Propio Negacion Predicado Ropa
+                           | Pronombre Negacion Predicado Ropa
+                           | Sujeto Negacion Predicado Tema
+                           ;
+
+Oracion_Yuxtapuesta ::=    Sujeto Predicado Sustantivo Signo_Coma
+                           | Sujeto Predicado Articulo Sustantivo Signo_Coma
+                           | Oracion_Yuxtapuesta
+                           ;
+
+Oracion_Copulativa ::=     Oracion Conjuncion Oracion 
+                           | Oracion Conjuncion Oracion_Copulativa
+                           ;
+
+Oracion_Interrogativa ::=  Signo_PreguntaAbre Predicado Signo_PreguntaCierra
+                           ;
+                           
+
+
+
+
+
