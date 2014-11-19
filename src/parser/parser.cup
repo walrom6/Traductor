@@ -23,30 +23,39 @@ parser code
 :}
 
 /* Terminales */
-terminal    Signo_Punto, Signo_Coma, Signo_PuntoComa, Signo_AdmiracionAbre, Signo_AdmiracionCierra, Signo_PreguntaAbre, Signo_PreguntaCierra,Signo_Guion;
+terminal    Signo_Punto, Signo_Coma, Signo_PuntoComa, Signo_AdmiracionAbre, Signo_AdmiracionCierra; 
+terminal    Signo_PreguntaAbre, Signo_PreguntaCierra, Signo_Guion;
 terminal    Ropa;
-terminal    Adverbio, Verbo, Pronombre, Literal, Sustantivo, Adjetivo, Preposicion, Articulo;
-terminal    Nombre_Propio, Identificador;
+terminal    Adverbio, Verbo, Pronombre, Literal, Sustantivo, Adjetivo, Preposicion, Articulo, Conjuncion;
+terminal    Negacion, Nombre_Propio, Identificador;
 terminal    Exponencial, Flotante, Real, Entero;
 
 /* No Terminales */
 non terminal Predicado, Parrafo, Oracion, Sujeto;
-non terminal Oracion_Negativa, Oracion_Yuxtapuesta, Oracion_Compulativa, Oracion_Interrogativa;
+non terminal Oracion_Negativa, Oracion_Yuxtapuesta, Oracion_Copulativa, Oracion_Interrogativa;
+
+precedence left Verbo;
+precedence left Sujeto;
 
 Parrafo ::=   Oracion {:System.out.println("Código analizado");:}
               | Oracion Parrafo
+              | Oracion_Interrogativa 
+              | Oracion_Interrogativa Parrafo
               ;
 
 Oracion ::=   Sujeto Predicado Signo_Punto
               | Nombre_Propio Predicado Ropa Signo_Punto
-              | Sujeto Verbo Ropa
+              | Sujeto Signo_Punto
+              | Sujeto Identificador Signo_Punto
+              | Sujeto
               ;
 
 Sujeto ::=   Articulo Ropa
+            | Articulo Sustantivo
             | Pronombre
             | Nombre_Propio
             | Ropa
-            ;  
+            ; 
 
 Predicado ::=   Verbo Preposicion Sujeto
                 | Verbo Preposicion Sustantivo
@@ -59,7 +68,7 @@ Oracion_Negativa ::=    Sujeto Negacion Predicado Signo_PreguntaCierra
                            | Sujeto Negacion Predicado Signo_PreguntaCierra
                            | Nombre_Propio Negacion Predicado Ropa
                            | Pronombre Negacion Predicado Ropa
-                           | Sujeto Negacion Predicado Tema
+                           | Sujeto Negacion Predicado Ropa
                            ;
 
 Oracion_Yuxtapuesta ::=    Sujeto Predicado Sustantivo Signo_Coma
@@ -67,14 +76,12 @@ Oracion_Yuxtapuesta ::=    Sujeto Predicado Sustantivo Signo_Coma
                            | Oracion_Yuxtapuesta
                            ;
 
-Oracion_Copulativa ::=     Oracion Conjuncion Oracion 
-                           | Oracion Conjuncion Oracion_Copulativa
+Oracion_Copulativa ::=     Oracion Conjuncion Oracion
+                           | Oracion 
                            ;
 
-Oracion_Interrogativa ::=  Signo_PreguntaAbre Predicado Signo_PreguntaCierra
+Oracion_Interrogativa ::=  {:System.out.println("Entra a pregunta");:}Signo_PreguntaAbre Sujeto Predicado Signo_PreguntaCierra
                            ;
-                           
-
 
 
 

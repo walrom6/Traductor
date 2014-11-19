@@ -231,6 +231,11 @@ nombre_propio = [A-ZÑ]+[a-zñ]*
 "las" {contador++; return new Symbol(sym.Articulo,yyline, yycolumn, yytext());}
 "lo" {contador++; return new Symbol(sym.Articulo,yyline, yycolumn, yytext());}
 
+/******************************** conjuncion *********************************/
+
+"y" {contador++; return new Symbol(sym.Conjuncion,yyline, yycolumn, yytext());}
+"o" {contador++; return new Symbol(sym.Conjuncion,yyline, yycolumn, yytext());}
+
 /*************************** signos de puntuacion ****************************/
 
 "." {contador++; return new Symbol(sym.Signo_Punto,yyline, yycolumn, yytext());}
