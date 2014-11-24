@@ -1,26 +1,31 @@
+
 package parser;
 
 import java_cup.runtime.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import parser.Traductor;
+import parser.Palabra;
 
 action code {:
-
-:};
+    public static Palabra palabras = new Palabra();
+    :};
 	
 parser code
 {:
-	public void syntax_error(Symbol s){
-		System.out.println("Error Sintáctico en la Linea: " + (s.left +1) + ", Columna: " + (s.right + 1) + 
-		" -> Texto: \"" + s.value + "\""); //+"Pila:  " + this.stack);
-	}
+
+    public void syntax_error(Symbol s){
+            System.out.println("Error Sintáctico en la Linea: " + (s.left +1) + ", Columna: " + (s.right + 1) + 
+            " -> Texto: \"" + s.value + "\""); //+"Pila:  " + this.stack);
+    }
    
     public void report_fatal_error(String message, Object info) {
         //report_error(message, info);
         //System.exit(1);
     }
 :}
+
 
 /* Terminales */
 terminal    Signo_Punto, Signo_Coma, Signo_PuntoComa, Signo_AdmiracionAbre, Signo_AdmiracionCierra; 
@@ -37,7 +42,8 @@ non terminal Oracion_Negativa, Oracion_Yuxtapuesta, Oracion_Copulativa, Oracion_
 precedence left Verbo;
 precedence left Sujeto;
 
-Parrafo ::=   Oracion {:System.out.println("Código analizado");:}
+Parrafo ::=   Oracion {: System.out.println("Código analizado");
+                         palabras.traducir();:}
               | Oracion Parrafo
               | Oracion_Interrogativa 
               | Oracion_Interrogativa Parrafo
@@ -50,37 +56,64 @@ Oracion ::=   Sujeto Predicado Signo_Punto
               | Sujeto
               ;
 
-Sujeto ::=   Articulo Ropa
-            | Articulo Sustantivo
-            | Pronombre
-            | Nombre_Propio
-            | Ropa
+Sujeto ::=   Articulo:articulo Ropa:ropa {: palabras.ListaPalabras.add((String)articulo);
+                                            palabras.ListaPalabras.add((String)ropa);
+                                         :}
+            | Articulo:articulo Sustantivo:sustantivo {: palabras.ListaPalabras.add((String)articulo);
+                                                         palabras.ListaPalabras.add((String)sustantivo);
+                                                      :}
+            | Pronombre:pronombre {: palabras.ListaPalabras.add((String)pronombre); :}
+            | Nombre_Propio:nombre_propio {: palabras.ListaPalabras.add((String)nombre_propio); :}
+            | Ropa:ropa {: palabras.ListaPalabras.add((String)ropa); :}
             ; 
 
-Predicado ::=   Verbo Preposicion Sujeto
-                | Verbo Preposicion Sustantivo
-                | Verbo Sustantivo
-                | Verbo Sujeto
-                | Verbo
+Predicado ::=   Verbo:verbo Preposicion:preposicion Sujeto {: palabras.ListaPalabras.add((String)verbo);
+                                                              palabras.ListaPalabras.add((String)preposicion);
+                                                           :}
+                | Verbo:verbo Preposicion:preposicion Sustantivo:sustantivo {: palabras.ListaPalabras.add((String)verbo);
+                                                                               palabras.ListaPalabras.add((String)preposicion);
+                                                                               palabras.ListaPalabras.add((String)sustantivo);
+                                                                            :}
+                | Verbo:verbo Sustantivo:sustantivo {: palabras.ListaPalabras.add((String)verbo);
+                                                       palabras.ListaPalabras.add((String)sustantivo);
+                                                    :}
+                | Verbo:verbo Sujeto {: palabras.ListaPalabras.add((String)verbo); :}
+                | Verbo:verbo {: palabras.ListaPalabras.add((String)verbo); :}
                 ;
 
-Oracion_Negativa ::=    Sujeto Negacion Predicado Signo_PreguntaCierra 
-                           | Sujeto Negacion Predicado Signo_PreguntaCierra
-                           | Nombre_Propio Negacion Predicado Ropa
-                           | Pronombre Negacion Predicado Ropa
-                           | Sujeto Negacion Predicado Ropa
+Oracion_Negativa ::=    Sujeto Negacion:negacion Predicado Signo_PreguntaCierra:preguntaCierra {: palabras.ListaPalabras.add((String)negacion);
+                                                                                            palabras.ListaPalabras.add((String)preguntaCierra);
+                                                                                               :}
+                           | Sujeto Negacion:negacion Predicado Signo_PreguntaCierra:preguntaCierra {: palabras.ListaPalabras.add((String)negacion);
+                                                                                            palabras.ListaPalabras.add((String)preguntaCierra);
+                                                                                            :}
+                           | Nombre_Propio:nombrePropio Negacion:negacion Predicado Ropa:ropa {: palabras.ListaPalabras.add((String)nombrePropio);
+                                                                                                 palabras.ListaPalabras.add((String)negacion);
+                                                                                                 palabras.ListaPalabras.add((String)ropa);
+                                                                                              :}
+                           | Pronombre:pronombre Negacion:negacion Predicado Ropa:ropa {: palabras.ListaPalabras.add((String)pronombre);
+                                                                                          palabras.ListaPalabras.add((String)negacion);
+                                                                                          palabras.ListaPalabras.add((String)ropa);
+                                                                                       :}
+                           | Sujeto Negacion:negacion Predicado Ropa:ropa {: palabras.ListaPalabras.add((String)negacion);
+                                                                             palabras.ListaPalabras.add((String)ropa);
+                                                                          :}
                            ;
 
-Oracion_Yuxtapuesta ::=    Sujeto Predicado Sustantivo Signo_Coma
-                           | Sujeto Predicado Articulo Sustantivo Signo_Coma
+Oracion_Yuxtapuesta ::=    Sujeto Predicado Sustantivo:sustantivo Signo_Coma:coma {: palabras.ListaPalabras.add((String)sustantivo);
+                                                                                  :}
+                           | Sujeto Predicado Articulo:articulo Sustantivo:sustantivo Signo_Coma:coma {: palabras.ListaPalabras.add((String)articulo);
+                                                                                                         palabras.ListaPalabras.add((String)sustantivo);
+                                                                                                      :}
                            | Oracion_Yuxtapuesta
                            ;
 
-Oracion_Copulativa ::=     Oracion Conjuncion Oracion
+Oracion_Copulativa ::=     Oracion Conjuncion:conjuncion Oracion {: palabras.ListaPalabras.add((String)conjuncion);
+                                                                 :}
                            | Oracion 
                            ;
 
-Oracion_Interrogativa ::=  {:System.out.println("Entra a pregunta");:}Signo_PreguntaAbre Sujeto Predicado Signo_PreguntaCierra
+Oracion_Interrogativa ::=  Signo_PreguntaAbre:preguntaAbre Sujeto Predicado Signo_PreguntaCierra:preguntaCierra 
                            ;
 
 

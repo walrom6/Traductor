@@ -11,10 +11,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import parser.Palabra;
 
 public class Principal {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, Exception {
+        
+        boolean traduccionValida = true;
+        Palabra ListaPalabras = new Palabra();
+        
         Funciones principal = new Funciones();
         System.out.println("---------------Inicio Análisis---------------");
         System.out.println("");
@@ -34,6 +39,7 @@ public class Principal {
 
                 //principal.leerTokens(archivo);
                 principal.Sintactico(archivo);
+                
                 break;
             }
             catch(IOException e){System.out.println("El archivo no existe");}
